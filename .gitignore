@@ -142,3 +142,5 @@ venv
 .md*
 md
 *md
+
+.env
