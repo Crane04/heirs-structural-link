@@ -22,6 +22,16 @@ export interface AnalyseResponse {
   fraudFlagged: boolean;
 }
 
+export interface Claim {
+  _id: string;
+  phoneNumber: string;
+  status: 'initiated' | 'scanning' | 'processing' | 'complete' | 'flagged';
+  carMake?: string;
+  carModel?: string;
+  claimUrl: string;
+  createdAt: string;
+}
+
 export interface Prediction {
   zone: string;
   damageType: string;
@@ -46,8 +56,8 @@ export interface DamageReport {
 }
 
 export const claimApi = {
-  getClaim: (claimId: string) =>
-    request(`/claim/${claimId}`),
+  getClaim: (claimId: string): Promise<Claim> =>
+    request<Claim>(`/claim/${claimId}`),
 
   analyse: (claimId: string, payload: AnalysePayload): Promise<AnalyseResponse> =>
     request(`/claim/${claimId}/analyse`, {

@@ -1,23 +1,39 @@
 import json
 import os
+from pathlib import Path
 
 _lookup: dict = {}
+_BASE_DIR = Path(__file__).resolve().parent
+
+
+def _resolve_local_path(path_str: str) -> Path:
+    p = Path(path_str)
+    if not p.is_absolute():
+        p = (_BASE_DIR / p).resolve()
+    return p
 
 
 def load_lookup():
     global _lookup
     if _lookup:
         return
-    path = os.getenv("LOOKUP_PATH", "lookup.json")
+    path = _resolve_local_path(os.getenv("LOOKUP_PATH", "lookup.json"))
+    if not path.exists():
+        raise FileNotFoundError(
+            f"Lookup table not found at {path}. "
+            "Set LOOKUP_PATH or place lookup.json next to ai/lookup.py."
+        )
     with open(path) as f:
         _lookup = json.load(f)
 
 
 def classify_severity(dent_depth_cm: float) -> str:
+    # Thresholds derived from Eniola's real ANSYS simulation data
+    # minor: 0–2cm | moderate: 2–7cm | significant: 7–14cm | severe: 14–22cm | critical: >22cm
     if dent_depth_cm < 2.0:   return "minor"
-    if dent_depth_cm < 5.0:   return "moderate"
-    if dent_depth_cm < 10.0:  return "significant"
-    if dent_depth_cm < 20.0:  return "severe"
+    if dent_depth_cm < 7.0:   return "moderate"
+    if dent_depth_cm < 14.0:  return "significant"
+    if dent_depth_cm < 22.0:  return "severe"
     return "critical"
 
 
@@ -28,7 +44,7 @@ def get_stress_prediction(car_model: str, impact_zone: str, dent_depth_cm: float
     """
     load_lookup()
 
-    car_key = car_model.lower().replace(" ", "_")  # "toyota_camry"
+    car_key  = car_model.lower().replace(" ", "_")  # "toyota_camry"
     severity = classify_severity(dent_depth_cm)
 
     try:
@@ -41,6 +57,7 @@ def get_stress_prediction(car_model: str, impact_zone: str, dent_depth_cm: float
             "plastic_deform":     entry.get("plastic_deformation", False),
             "visible_damage":     entry.get("visible_damage", ""),
             "hidden_damage":      entry.get("predicted_hidden_damage", ""),
+            # Real data uses "components_at_risk" key (converted from "Component at Risk" column)
             "components_at_risk": entry.get("components_at_risk", ""),
             "severity_score":     entry.get("severity_score", 0),
             "recommended_action": entry.get("recommended_action", ""),
@@ -48,7 +65,6 @@ def get_stress_prediction(car_model: str, impact_zone: str, dent_depth_cm: float
             "found":              True,
         }
     except KeyError:
-        # Fallback — car/zone/severity combo not yet in lookup
         return {
             "severity":           severity,
             "von_mises_stress":   0,

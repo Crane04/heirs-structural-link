@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { claimApi, DamageReport, Prediction } from '../api/client';
 import DamageMap from '../components/DamageMap';
+import ClaimShell from '../components/layout/ClaimShell';
+import Button from '../components/ui/Button';
+import Card from '../components/ui/Card';
 
 function formatNgn(amount: number): string {
   return new Intl.NumberFormat('en-NG', {
@@ -29,13 +32,13 @@ function SeverityBadge({ severity }: { severity: string }) {
 function PredictionCard({ p }: { p: Prediction }) {
   const [expanded, setExpanded] = useState(false);
   return (
-    <div className="bg-white/5 border border-white/10 rounded-xl overflow-hidden">
+    <div className="bg-surface border border-border/60 rounded-2xl overflow-hidden">
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full flex items-center justify-between px-4 py-3 text-left"
+        className="w-full flex items-center justify-between px-4 py-4 text-left hover:bg-white/5 transition-colors"
       >
         <div className="flex items-center gap-3">
-          <div className={`w-2.5 h-2.5 rounded-full ${p.fraudFlagged ? 'bg-gold' : 'bg-red-400'}`} />
+          <div className={`w-2.5 h-2.5 rounded-full ${p.fraudFlagged ? 'bg-gold' : 'bg-teal'}`} />
           <div>
             <p className="text-white font-semibold text-sm capitalize">{p.zone.replace(/_/g, ' ')}</p>
             <p className="text-white/40 text-xs capitalize">{p.damageType} · {p.dentDepthCm.toFixed(1)}cm depth</p>
@@ -48,14 +51,14 @@ function PredictionCard({ p }: { p: Prediction }) {
       </button>
 
       {expanded && (
-        <div className="px-4 pb-4 flex flex-col gap-3 border-t border-white/5 pt-3">
+        <div className="px-4 pb-5 flex flex-col gap-3 border-t border-border/40 pt-4">
           <div>
             <p className="text-white/40 text-xs uppercase tracking-wider mb-1">Visible Damage</p>
             <p className="text-white/80 text-sm">{p.payoutParts}</p>
           </div>
           <div>
             <p className="text-white/40 text-xs uppercase tracking-wider mb-1">Predicted Hidden Damage</p>
-            <p className="text-teal text-sm">{p.hiddenDamage}</p>
+            <p className="text-tealL text-sm">{p.hiddenDamage}</p>
           </div>
           <div>
             <p className="text-white/40 text-xs uppercase tracking-wider mb-1">Components at Risk</p>
@@ -79,6 +82,7 @@ function PredictionCard({ p }: { p: Prediction }) {
 
 export default function Report() {
   const { claimId }   = useParams<{ claimId: string }>();
+  const navigate = useNavigate();
   const [report, setReport] = useState<DamageReport | null>(null);
   const [loading, setLoading] = useState(true);
   const [accepting, setAccepting] = useState(false);
@@ -109,7 +113,7 @@ export default function Report() {
   if (loading) {
     return (
       <div className="min-h-screen bg-navy flex items-center justify-center">
-        <div className="w-12 h-12 border-4 border-teal/20 border-t-teal rounded-full animate-spin" />
+        <div className="w-12 h-12 border-4 border-white/10 border-t-teal rounded-full animate-spin" />
       </div>
     );
   }
@@ -125,83 +129,112 @@ export default function Report() {
   if (!report) return null;
 
   const damagedZones = report.predictions.map((p) => p.zone);
+  const zonesDetected = Array.from(new Set(damagedZones)).length;
 
   return (
-    <div className="min-h-screen bg-navy pb-32">
-      {/* Header */}
-      <div className={`px-4 py-4 ${report.fraudFlagged ? 'bg-gold/20 border-b border-gold/30' : 'border-b border-teal/20'}`}>
-        <p className="text-xs font-bold tracking-widest uppercase text-teal">Heirs Insurance</p>
-        <h1 className="text-white font-bold text-xl mt-0.5">
-          {report.fraudFlagged ? '⚠️ Claim Flagged for Review' : '✅ Damage Report Ready'}
-        </h1>
-      </div>
+    <ClaimShell claimId={claimId} active="report" navActive="analytics">
+      <div className="pb-28">
+        <div className="flex items-end justify-between flex-wrap gap-6">
+          <div>
+            <div className="text-4xl font-bold tracking-tight">Analysis</div>
+            <div className="text-white/55 text-sm mt-2">
+              Claim {claimId?.slice(0, 8).toUpperCase()} • Generated via Structural‑Link AI
+            </div>
+          </div>
+          <span className="hs-chip">
+            <span className={`w-2 h-2 rounded-full ${report.fraudFlagged ? 'bg-gold' : 'bg-teal'}`} />
+            {report.fraudFlagged ? 'FLAGGED' : 'COMPLETE'}
+          </span>
+        </div>
 
-      <div className="px-4 pt-6 flex flex-col gap-6">
+        <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <Card className="p-6">
+            <div className="text-[11px] tracking-widest uppercase text-white/45">Estimated payout</div>
+            <div className="mt-3 text-4xl font-bold">{formatNgn(report.totalPayoutNgn)}</div>
+            <div className="mt-2 text-xs text-white/45">Based on Ladipo Market seed pricing</div>
+          </Card>
+          <Card className="p-6">
+            <div className="text-[11px] tracking-widest uppercase text-white/45">Fraud flagged</div>
+            <div className="mt-3 text-4xl font-bold">{report.fraudFlagged ? 'Yes' : 'No'}</div>
+            <div className="mt-2 text-xs text-white/45">
+              {report.fraudFlagged ? 'Physics verification mismatch detected' : 'Structural integrity match'}
+            </div>
+          </Card>
+          <Card className="p-6">
+            <div className="text-[11px] tracking-widest uppercase text-white/45">Zones detected</div>
+            <div className="mt-3 text-4xl font-bold">{zonesDetected}</div>
+            <div className="mt-2 text-xs text-white/45">Frontal & lateral impact clusters</div>
+          </Card>
+        </div>
 
-        {/* Fraud flag banner */}
         {report.fraudFlagged && (
-          <div className="bg-gold/10 border border-gold/30 rounded-xl px-4 py-4">
-            <p className="text-gold font-bold text-sm mb-1">Physics Verification Failed</p>
-            <p className="text-white/70 text-sm">
-              Our Von Mises stress analysis detected an inconsistency between the reported impact and the structural damage observed. A Heirs claims officer will contact you within 24 hours.
-            </p>
+          <div className="mt-6">
+            <Card className="p-6 border border-gold/40 bg-surface2/40">
+              <div className="text-gold font-bold">Claim flagged for review</div>
+              <p className="text-white/60 text-sm mt-2">
+                Our Von Mises stress analysis detected an inconsistency between reported impact and observed structural
+                damage. A Heirs claims officer will contact you within 24 hours.
+              </p>
+              <div className="mt-4">
+                <Button variant="secondary" onClick={() => navigate(`/claim/${claimId}/scan`)}>
+                  Rescan
+                </Button>
+              </div>
+            </Card>
           </div>
         )}
 
-        {/* Car diagram + payout */}
-        <div className="bg-white/5 border border-white/10 rounded-2xl p-4 flex flex-col items-center gap-4">
-          <DamageMap damagedZones={damagedZones} fraudFlagged={report.fraudFlagged} />
-          <div className="w-full text-center border-t border-white/10 pt-4">
-            <p className="text-white/40 text-xs uppercase tracking-wider mb-1">Estimated Payout</p>
-            <p className="text-4xl font-bold text-white">{formatNgn(report.totalPayoutNgn)}</p>
-            <p className="text-white/40 text-xs mt-1">Based on live Ladipo Market prices</p>
+        <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+          <Card className="p-6">
+            <div className="text-[11px] tracking-widest uppercase text-white/45 mb-4">Damage map</div>
+            <div className="bg-surface2/30 border border-border/50 rounded-2xl p-4">
+              <DamageMap damagedZones={damagedZones} fraudFlagged={report.fraudFlagged} />
+            </div>
+          </Card>
+
+          <div>
+            <div className="text-[11px] tracking-widest uppercase text-white/45 mb-4">
+              {report.predictions.length} zone{report.predictions.length !== 1 ? 's' : ''} detected
+            </div>
+            <div className="flex flex-col gap-3">
+              {report.predictions.map((p, i) => (
+                <PredictionCard key={i} p={p} />
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* Predictions */}
-        <div>
-          <p className="text-white/40 text-xs uppercase tracking-wider mb-3">
-            {report.predictions.length} Damage Zone{report.predictions.length !== 1 ? 's' : ''} Detected
-          </p>
-          <div className="flex flex-col gap-3">
-            {report.predictions.map((p, i) => (
-              <PredictionCard key={i} p={p} />
-            ))}
-          </div>
-        </div>
-
-        {/* Claim ID */}
-        <div className="bg-white/5 rounded-xl px-4 py-3 flex justify-between items-center">
-          <p className="text-white/40 text-xs">Claim Reference</p>
-          <p className="text-white font-mono text-xs">{claimId}</p>
+        <div className="mt-6">
+          <Card className="p-5 flex items-center justify-between gap-4">
+            <div className="text-sm text-white/55">Claim reference</div>
+            <div className="font-mono text-xs text-white/80">{claimId}</div>
+          </Card>
         </div>
       </div>
 
-      {/* Sticky Accept Payout button */}
       {!report.fraudFlagged && (
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-navy/95 border-t border-white/10 backdrop-blur-sm">
-          {accepted ? (
-            <div className="bg-teal/20 border border-teal rounded-xl py-4 text-center">
-              <p className="text-teal font-bold text-lg">🎉 Payout Accepted!</p>
-              <p className="text-white/60 text-sm mt-1">Heirs Insurance will process your payment shortly.</p>
+        <div className="fixed bottom-0 left-0 right-0 z-30 bg-navy/90 backdrop-blur border-t border-border/50">
+          <div className="mx-auto max-w-6xl px-4 py-4 flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
+            <div className="text-xs text-white/45">
+              {accepted ? 'Payout accepted. Processing…' : 'Review complete. You can accept payout or rescan.'}
+              {error && <div className="text-gold font-semibold mt-1">{error}</div>}
             </div>
-          ) : (
-            <>
-              {error && <p className="text-red-400 text-sm text-center mb-2">{error}</p>}
-              <button
+            <div className="flex gap-3">
+              <Button variant="secondary" onClick={() => navigate(`/claim/${claimId}/scan`)} className="px-6">
+                Rescan
+              </Button>
+              <Button
+                variant="solid"
                 onClick={handleAccept}
-                disabled={accepting}
-                className="w-full py-4 bg-teal text-white font-bold text-lg rounded-xl disabled:opacity-50 hover:bg-tealL transition-colors"
+                disabled={accepting || accepted}
+                className="px-7"
               >
-                {accepting ? 'Processing...' : `Accept Payout — ${formatNgn(report.totalPayoutNgn)}`}
-              </button>
-              <p className="text-white/30 text-xs text-center mt-2">
-                By accepting you agree to the Heirs Insurance claim terms
-              </p>
-            </>
-          )}
+                {accepted ? 'Accepted' : accepting ? 'Processing…' : `Accept payout • ${formatNgn(report.totalPayoutNgn)}`}
+              </Button>
+            </div>
+          </div>
         </div>
       )}
-    </div>
+    </ClaimShell>
   );
 }

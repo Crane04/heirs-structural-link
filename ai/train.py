@@ -7,7 +7,8 @@ Usage:
 """
 
 import argparse
-from ultralytics import YOLO
+from ultralytics import YOLO # type: ignore
+
 
 
 def train(data_yaml: str, epochs: int, batch: int, device: str):
@@ -37,7 +38,7 @@ def train(data_yaml: str, epochs: int, batch: int, device: str):
 
     print("\n✅ Training complete.")
     print(f"   Best weights: runs/detect/heirs_damage_v1/weights/best.pt")
-    print(f"   Copy best.pt to apps/ai/ before deploying.\n")
+    print(f"   Copy best.pt to ai/ before deploying.\n")
 
     # Validate
     print("Running validation...")

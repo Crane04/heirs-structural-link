@@ -4,10 +4,16 @@ export default {
   theme: {
     extend: {
       colors: {
-        navy:  '#0B1F3A',
-        teal:  '#028090',
-        tealL: '#00A896',
-        gold:  '#F4A61D',
+        navy: '#061425',
+        surface: '#0B1F36',
+        surface2: '#0E2A3F',
+        border: '#123052',
+        teal: '#2AAE9B',   // muted accent (avoid neon)
+        tealL: '#74E3D3',  // highlight accent (use sparingly)
+        gold: '#D9A441',
+      },
+      fontFamily: {
+        sans: ['Poppins', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
     },
   },

@@ -1,11 +1,12 @@
 import Redis from 'ioredis';
+import { env } from './config/env';
 
 let redis: Redis;
 
 export function getRedis(): Redis {
   if (!redis) {
-    redis = new Redis(process.env.REDIS_URL!, {
-      tls: process.env.REDIS_URL?.startsWith('rediss') ? {} : undefined,
+    redis = new Redis(env.REDIS_URL, {
+      tls: env.REDIS_URL.startsWith('rediss') ? {} : undefined,
       maxRetriesPerRequest: 3,
     });
     redis.on('error', (err) => console.error('[Redis]', err.message));

@@ -1,20 +1,49 @@
+import os
 import torch
 import cv2
 import numpy as np
-
-_model       = None
-_transforms  = None
+from pathlib import Path
+from typing import Any, Callable, cast
 
 SCALE_FACTOR = 0.15  # Calibration — tune this against a real measured dent
+_BASE_DIR = Path(__file__).resolve().parent
+
+TransformFn = Callable[[np.ndarray], torch.Tensor]
+
+_model: torch.nn.Module | None = None
+_transforms: TransformFn | None = None
 
 
-def get_model():
+def get_model() -> tuple[torch.nn.Module, TransformFn]:
     global _model, _transforms
     if _model is None:
-        _model      = torch.hub.load("intel-isl/MiDaS", "MiDaS_small", trust_repo=True)
-        _transforms = torch.hub.load("intel-isl/MiDaS", "transforms",  trust_repo=True).small_transform
-        _model.eval()
-    return _model, _transforms
+        try:
+            # Ensure torch.hub cache is writable (defaults to ~/.cache/torch which may be read-only in some deploys).
+            hub_dir = Path(os.getenv("TORCH_HOME", str(_BASE_DIR / ".torch"))).resolve()
+            hub_dir.mkdir(parents=True, exist_ok=True)
+            torch.hub.set_dir(str(hub_dir))
+
+            loaded_model = cast(
+                torch.nn.Module,
+                torch.hub.load("intel-isl/MiDaS", "MiDaS_small", trust_repo="check"),
+            )
+            loaded_model.eval()
+            _model = loaded_model
+
+            transforms_module: Any = torch.hub.load("intel-isl/MiDaS", "transforms", trust_repo="check")
+            _transforms = getattr(transforms_module, "small_transform", None)
+        except Exception as e:
+            raise RuntimeError(
+                "Failed to load MiDaS via torch.hub. This download happens on first run.\n"
+                "- Ensure the machine has internet access at least once, OR\n"
+                "- Pre-warm the Torch Hub cache and set TORCH_HOME to that cache directory.\n"
+                f"Original error: {e}"
+            ) from e
+
+    if _model is None or _transforms is None or not callable(_transforms):
+        raise RuntimeError("MiDaS model/transforms failed to initialize.")
+
+    return cast(torch.nn.Module, _model), cast(TransformFn, _transforms)
 
 
 def estimate_depth(image_path: str) -> np.ndarray:
@@ -24,7 +53,10 @@ def estimate_depth(image_path: str) -> np.ndarray:
     """
     model, transforms = get_model()
 
-    img     = cv2.imread(image_path)
+    img = cv2.imread(image_path)
+    if img is None:
+        raise FileNotFoundError(f"Could not read image at path: {image_path}")
+
     img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
     input_batch = transforms(img_rgb)

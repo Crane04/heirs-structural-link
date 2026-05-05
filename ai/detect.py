@@ -1,15 +1,29 @@
 import os
 import cv2
 import numpy as np
-from ultralytics import YOLO
+from pathlib import Path
+from ultralytics import YOLO  # type: ignore
 
 _model = None
+_BASE_DIR = Path(__file__).resolve().parent
+
+
+def _resolve_local_path(path_str: str) -> str:
+    """
+    Resolve a path from env/default.
+    - Absolute paths are used as-is.
+    - Relative paths are resolved relative to this file's directory (ai/).
+    """
+    p = Path(path_str)
+    if not p.is_absolute():
+        p = (_BASE_DIR / p).resolve()
+    return str(p)
 
 def get_model() -> YOLO:
     global _model
     if _model is None:
         model_path = os.getenv("MODEL_PATH", "best.pt")
-        _model = YOLO(model_path)
+        _model = YOLO(_resolve_local_path(model_path))
     return _model
 
 
