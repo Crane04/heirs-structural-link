@@ -1,6 +1,6 @@
 import type { Request, Response } from 'express';
 import { HttpError } from '../errors/HttpError';
-import { getClaimOrThrow } from '../services/claimService';
+import { createClaimForPhone, getClaimOrThrow } from '../services/claimService';
 import { analyseWithAi } from '../services/aiService';
 import { createDamageReport, getReportByClaimObjectId } from '../services/reportService';
 import { sendWhatsApp, buildClaimReadyMessage, buildFraudFlagMessage } from '../notify';
@@ -39,9 +39,9 @@ export async function analyseClaim(req: Request, res: Response) {
 
   const whatsappTo = `whatsapp:${claim.phoneNumber}`;
   if (ai.fraudFlagged) {
-    await sendWhatsApp(whatsappTo, buildFraudFlagMessage());
+    await sendWhatsApp(whatsappTo, buildFraudFlagMessage(ai.predictions));
   } else {
-    await sendWhatsApp(whatsappTo, buildClaimReadyMessage(String(claim._id), ai.totalPayoutNgn));
+    await sendWhatsApp(whatsappTo, buildClaimReadyMessage(String(claim._id), ai.totalPayoutNgn, ai.predictions));
   }
 
   res.json({ reportId: report._id, fraudFlagged: ai.fraudFlagged });
@@ -73,3 +73,38 @@ export async function acceptReport(req: Request, res: Response) {
   res.json({ success: true, acceptedAt: report.acceptedAt });
 }
 
+export async function sandboxAnalyse(req: Request, res: Response) {
+  const { frameUrl, carModel } = req.body as {
+    frameUrl?: string;
+    carModel?: string;
+  };
+
+  if (!frameUrl) throw new HttpError(400, 'No frameUrl provided');
+  if (!carModel) throw new HttpError(400, 'No carModel provided');
+  if (!SUPPORTED_MODELS.has(carModel)) throw new HttpError(400, 'Unsupported car model');
+  const { claim } = await createClaimForPhone('+00000000000');
+
+  claim.status = 'processing';
+  claim.carModel = carModel;
+  await claim.save();
+
+  const ai = await analyseWithAi([frameUrl], carModel);
+
+  const report = await createDamageReport({
+    claimObjectId: claim._id,
+    predictions: ai.predictions,
+    totalPayoutNgn: ai.totalPayoutNgn,
+    fraudFlagged: ai.fraudFlagged,
+  });
+
+  claim.status = ai.fraudFlagged ? 'flagged' : 'complete';
+  await claim.save();
+
+  res.json({
+    claimId: String(claim._id),
+    reportId: String(report._id),
+    fraudFlagged: ai.fraudFlagged,
+    totalPayoutNgn: ai.totalPayoutNgn,
+    predictions: ai.predictions,
+  });
+}

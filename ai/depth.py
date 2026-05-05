@@ -5,13 +5,34 @@ import numpy as np
 from pathlib import Path
 from typing import Any, Callable, cast
 
-SCALE_FACTOR = 0.15  # Calibration — tune this against a real measured dent
+SCALE_FACTOR = 0.15  
 _BASE_DIR = Path(__file__).resolve().parent
 
 TransformFn = Callable[[np.ndarray], torch.Tensor]
 
 _model: torch.nn.Module | None = None
 _transforms: TransformFn | None = None
+
+
+def _trust_torch_hub_repos(repos: list[str]) -> None:
+    """
+    Pre-trust hub repos to avoid interactive y/N prompts in non-interactive runs.
+    Torch stores trusted repos in a text file under the hub dir.
+    """
+    try:
+        hub_dir = Path(torch.hub.get_dir()).resolve()
+        trusted = hub_dir / "trusted_list"
+        existing: set[str] = set()
+        if trusted.exists():
+            existing = {line.strip() for line in trusted.read_text().splitlines() if line.strip()}
+        wanted = set(existing)
+        wanted.update(repos)
+        if wanted != existing:
+            trusted.parent.mkdir(parents=True, exist_ok=True)
+            trusted.write_text("\n".join(sorted(wanted)) + "\n")
+    except Exception:
+        # If this fails, torch.hub may still prompt; caller will surface error.
+        return
 
 
 def get_model() -> tuple[torch.nn.Module, TransformFn]:
@@ -22,15 +43,19 @@ def get_model() -> tuple[torch.nn.Module, TransformFn]:
             hub_dir = Path(os.getenv("TORCH_HOME", str(_BASE_DIR / ".torch"))).resolve()
             hub_dir.mkdir(parents=True, exist_ok=True)
             torch.hub.set_dir(str(hub_dir))
+            _trust_torch_hub_repos([
+                "intel-isl/MiDaS",
+                "rwightman/gen-efficientnet-pytorch",
+            ])
 
             loaded_model = cast(
                 torch.nn.Module,
-                torch.hub.load("intel-isl/MiDaS", "MiDaS_small", trust_repo="check"),
+                torch.hub.load("intel-isl/MiDaS", "MiDaS_small", trust_repo=True),
             )
             loaded_model.eval()
             _model = loaded_model
 
-            transforms_module: Any = torch.hub.load("intel-isl/MiDaS", "transforms", trust_repo="check")
+            transforms_module: Any = torch.hub.load("intel-isl/MiDaS", "transforms", trust_repo=True)
             _transforms = getattr(transforms_module, "small_transform", None)
         except Exception as e:
             raise RuntimeError(

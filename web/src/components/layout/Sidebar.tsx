@@ -22,13 +22,13 @@ const items: Array<{
 
 export default function Sidebar({ claimId, active = 'scan' }: Props) {
   return (
-    <aside className="hidden lg:flex w-64 flex-col border-r border-border/50 bg-surface/30">
+    <aside className="hidden lg:flex w-64 flex-col border-r border-border bg-surface2/60">
       <div className="px-6 py-6">
-        <div className="flex items-center gap-2 text-xs font-semibold tracking-widest text-white/70 uppercase">
-          <span className="w-2 h-2 rounded-full bg-teal" />
+        <div className="flex items-center gap-2 text-xs font-semibold tracking-widest text-ink/70 uppercase">
+          <span className="w-2 h-2 rounded-full bg-ink" />
           Structural-Link
         </div>
-        <div className="text-[11px] text-white/50 mt-1">AI engine active</div>
+        <div className="text-[11px] text-ink/50 mt-1">AI engine active</div>
       </div>
 
       <nav className="px-3 flex flex-col gap-1">
@@ -41,12 +41,12 @@ export default function Sidebar({ claimId, active = 'scan' }: Props) {
               className={cn(
                 'flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-colors',
                 disabled && 'opacity-40 pointer-events-none',
-                active === item.key ? 'bg-white/5 border border-teal/30 text-white' : 'text-white/70 hover:bg-white/5'
+                active === item.key ? 'bg-ink/5 border border-ink/20 text-ink' : 'text-ink/70 hover:bg-ink/5'
               )}
             >
               <Icon
                 name={item.icon}
-                className={cn('w-5 h-5 text-teal/80', active === item.key && 'text-teal')}
+                className={cn('w-5 h-5 text-ink/70', active === item.key && 'text-ink')}
               />
               {item.label}
             </Link>
@@ -54,9 +54,9 @@ export default function Sidebar({ claimId, active = 'scan' }: Props) {
         })}
       </nav>
 
-      <div className="mt-auto px-6 py-6 text-xs text-white/40">
+      <div className="mt-auto px-6 py-6 text-xs text-ink/40">
         <div className="flex items-center gap-2">
-          <span className="w-1.5 h-1.5 rounded-full bg-teal/70" />
+          <span className="w-1.5 h-1.5 rounded-full bg-ink/60" />
           AI engine active
         </div>
       </div>

@@ -58,7 +58,7 @@ export default function Landing() {
   const whatsappUrl = import.meta.env.VITE_WHATSAPP_START_URL as string | undefined;
 
   return (
-    <div className="min-h-screen bg-navy text-white">
+    <div className="min-h-screen bg-offwhite text-ink">
       <TopNav active="claims" />
 
       <div className="mx-auto w-full max-w-6xl px-4 py-14">
@@ -66,13 +66,13 @@ export default function Landing() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
           <div>
             <div className="hs-chip mb-6 w-fit">
-              <span className="w-2 h-2 rounded-full bg-teal" />
+              <span className="w-2 h-2 rounded-full bg-ink" />
               Trusted by 10k+ drivers
             </div>
             <h1 className="text-4xl sm:text-5xl font-bold leading-[1.05] tracking-tight">
               Precision damage detection via AI
             </h1>
-            <p className="mt-5 text-white/65 text-base sm:text-lg max-w-xl">
+            <p className="mt-5 text-ink/65 text-base sm:text-lg max-w-xl">
               Start your claim instantly on WhatsApp. Our neural networks analyse structural integrity in seconds,
               ensuring accurate estimates without the wait.
             </p>
@@ -81,7 +81,7 @@ export default function Landing() {
               <a href={whatsappUrl || '#'} target="_blank" rel="noreferrer" className="w-full sm:w-auto">
                 <Button variant="solid" disabled={!whatsappUrl} className="w-full sm:w-auto px-6 py-3 rounded-xl">
                   Start on WhatsApp
-                  <span className="text-navy/80">→</span>
+                  <span className="text-offwhite/80">→</span>
                 </Button>
               </a>
               <Button
@@ -94,9 +94,9 @@ export default function Landing() {
             </div>
 
             {!whatsappUrl && (
-              <p className="mt-3 text-xs text-white/35">
-                WhatsApp link not configured. Set <code className="text-white/60">VITE_WHATSAPP_START_URL</code> in{' '}
-                <code className="text-white/60">web/.env</code>.
+              <p className="mt-3 text-xs text-ink/45">
+                WhatsApp link not configured. Set <code className="text-ink/70">VITE_WHATSAPP_START_URL</code> in{' '}
+                <code className="text-ink/70">web/.env</code>.
               </p>
             )}
           </div>
@@ -109,15 +109,15 @@ export default function Landing() {
                   <rect x="0" y="0" width="520" height="220" fill="transparent" />
                   <path
                     d="M98 132c10-34 34-52 74-57 55-7 152-7 198 0 46 7 71 25 83 57l8 23c2 6-2 12-9 12H78c-7 0-11-6-9-12l8-23Z"
-                    fill="rgba(255,255,255,0.06)"
+                    fill="rgba(6,20,37,0.06)"
                     stroke="rgba(116,227,211,0.35)"
                     strokeWidth="2"
                   />
-                  <circle cx="165" cy="170" r="22" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.2)" />
-                  <circle cx="360" cy="170" r="22" fill="rgba(255,255,255,0.05)" stroke="rgba(255,255,255,0.2)" />
+                  <circle cx="165" cy="170" r="22" fill="rgba(6,20,37,0.04)" stroke="rgba(6,20,37,0.20)" />
+                  <circle cx="360" cy="170" r="22" fill="rgba(6,20,37,0.04)" stroke="rgba(6,20,37,0.20)" />
                   <path
                     d="M170 98c18-20 42-28 72-30 52-4 96-4 140 0 30 2 52 10 70 30"
-                    stroke="rgba(255,255,255,0.20)"
+                    stroke="rgba(6,20,37,0.20)"
                     strokeWidth="2"
                     fill="none"
                   />
@@ -126,11 +126,11 @@ export default function Landing() {
 
               <div className="mt-5 flex items-center justify-between gap-4">
                 <div>
-                  <div className="text-2xl font-bold text-white">99.8%</div>
-                  <div className="text-[11px] uppercase tracking-widest text-white/50">Detection accuracy</div>
+                  <div className="text-2xl font-bold text-ink">99.8%</div>
+                  <div className="text-[11px] uppercase tracking-widest text-ink/50">Detection accuracy</div>
                 </div>
                 <div className="hs-chip">
-                  <span className="w-2 h-2 rounded-full bg-teal" />
+                  <span className="w-2 h-2 rounded-full bg-ink" />
                   Structural engine active
                 </div>
               </div>
@@ -143,7 +143,7 @@ export default function Landing() {
           <div className="flex items-end justify-between gap-6">
             <div>
               <h2 className="text-2xl font-bold">How it works</h2>
-              <p className="text-white/50 text-sm mt-2">Three simple steps to resolve your claim.</p>
+              <p className="text-ink/50 text-sm mt-2">Three simple steps to resolve your claim.</p>
             </div>
           </div>
 
@@ -152,12 +152,12 @@ export default function Landing() {
               <Card key={s.title} className="p-6">
                 <div className="flex items-center justify-between">
                   <div className="hs-chip">{String(i + 1).padStart(2, '0')}</div>
-                  <div className="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-teal">
+                  <div className="w-9 h-9 rounded-xl bg-ink/5 border border-ink/10 flex items-center justify-center text-ink">
                     ■
                   </div>
                 </div>
-                <div className="mt-5 font-semibold text-white">{s.title}</div>
-                <div className="mt-2 text-sm text-white/55">{s.body}</div>
+                <div className="mt-5 font-semibold">{s.title}</div>
+                <div className="mt-2 text-sm text-ink/55">{s.body}</div>
               </Card>
             ))}
           </div>
@@ -166,15 +166,15 @@ export default function Landing() {
         {/* Features */}
         <div className="mt-20">
           <h2 className="text-2xl font-bold">Features</h2>
-          <p className="text-white/50 text-sm mt-2">Designed for speed, clarity, and claims confidence.</p>
+          <p className="text-ink/50 text-sm mt-2">Designed for speed, clarity, and claims confidence.</p>
           <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
             {FEATURES.map((f) => (
               <Card key={f.title} className="p-6">
-                <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-teal">
+                <div className="w-10 h-10 rounded-xl bg-ink/5 border border-ink/10 flex items-center justify-center text-ink">
                   ●
                 </div>
                 <div className="mt-4 font-semibold">{f.title}</div>
-                <div className="mt-2 text-sm text-white/55">{f.body}</div>
+                <div className="mt-2 text-sm text-ink/55">{f.body}</div>
               </Card>
             ))}
           </div>
@@ -185,16 +185,16 @@ export default function Landing() {
           <div className="flex items-end justify-between gap-6">
             <div>
               <h2 className="text-2xl font-bold">Supported vehicles</h2>
-              <p className="text-white/50 text-sm mt-2">Our AI is specialized for top-tier automotive precision.</p>
+              <p className="text-ink/50 text-sm mt-2">Our AI is specialized for top-tier automotive precision.</p>
             </div>
-            <div className="text-xs text-teal/80 font-semibold hidden sm:block">VIEW ALL MODELS →</div>
+            <div className="text-xs text-ink/60 font-semibold hidden sm:block">VIEW ALL MODELS →</div>
           </div>
           <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
             {['Toyota Camry', 'Honda Accord', 'Lexus RX'].map((m) => (
               <Card key={m} className="p-5">
                 <div className="rounded-xl bg-surface2/50 border border-border/50 aspect-[16/9]" />
                 <div className="mt-4 font-semibold">{m}</div>
-                <div className="text-xs text-white/45 mt-1">FULL SUPPORT • 2020–2024</div>
+                <div className="text-xs text-ink/45 mt-1">FULL SUPPORT • 2020–2024</div>
               </Card>
             ))}
           </div>
@@ -207,10 +207,10 @@ export default function Landing() {
             {FAQ.map((item) => (
               <details key={item.q} className="hs-card px-5 py-4">
                 <summary className="cursor-pointer list-none flex items-center justify-between gap-3">
-                  <span className="font-semibold text-white/90">{item.q}</span>
-                  <span className="text-white/40">⌄</span>
+                  <span className="font-semibold text-ink/90">{item.q}</span>
+                  <span className="text-ink/40">⌄</span>
                 </summary>
-                <p className="mt-3 text-sm text-white/60">{item.a}</p>
+                <p className="mt-3 text-sm text-ink/60">{item.a}</p>
               </details>
             ))}
           </div>
@@ -220,7 +220,7 @@ export default function Landing() {
         <div className="mt-20">
           <Card className="p-10 text-center">
             <h3 className="text-3xl font-bold">Ready to scan?</h3>
-            <p className="mt-3 text-white/55 text-sm">
+            <p className="mt-3 text-ink/55 text-sm">
               Join thousands of drivers who have simplified their insurance claims with Heirs AI.
             </p>
             <div className="mt-7 flex justify-center">
@@ -234,8 +234,8 @@ export default function Landing() {
         </div>
 
         {/* Footer */}
-        <div className="mt-16 pb-10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-white/40">
-          <div className="font-semibold text-white/70">Heirs Structural‑Link AI</div>
+        <div className="mt-16 pb-10 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-ink/40">
+          <div className="font-semibold text-ink/70">Heirs Structural‑Link AI</div>
           <div className="flex items-center gap-6">
             <span>Privacy protocol</span>
             <span>Terms of service</span>

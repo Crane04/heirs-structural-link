@@ -106,9 +106,9 @@ export default function Scan() {
             <div className="flex items-center gap-3">
               <h1 className="text-3xl font-bold tracking-tight">Scan Vehicle Damage</h1>
               <span className="hs-chip">{claimId ? toUpperSlug(claimId.slice(0, 7)) : '—'}</span>
-              <button className="text-white/50 text-sm hover:text-white/70 transition-colors">Need help?</button>
+              <button className="text-ink/50 text-sm hover:text-ink/70 transition-colors">Need help?</button>
             </div>
-            <p className="text-white/50 text-sm mt-2">
+            <p className="text-ink/50 text-sm mt-2">
               Capture 6 frames to enable submission. Keep the vehicle centered in the guide.
             </p>
           </div>
@@ -120,7 +120,7 @@ export default function Scan() {
                 onClick={() => setCarModel(m)}
                 className={[
                   'px-4 py-2 text-xs font-bold tracking-widest rounded-lg transition-colors uppercase',
-                  carModel === m ? 'bg-surface2 border border-teal/40 text-tealL' : 'text-white/60 hover:text-white/80',
+                  carModel === m ? 'bg-surface2 border border-ink/20 text-ink' : 'text-ink/60 hover:text-ink/80',
                 ].join(' ')}
               >
                 {m}
@@ -137,16 +137,16 @@ export default function Scan() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
           <Card className="lg:col-span-2 p-5">
-            <div className="rounded-2xl border border-border/60 bg-black/40 overflow-hidden relative aspect-[16/9]">
+            <div className="rounded-2xl border border-border/60 bg-ink/10 overflow-hidden relative aspect-[16/9]">
               <video ref={videoRef} playsInline muted className="w-full h-full object-cover opacity-90" />
               <GhostFrame aligned={aligned} />
               <div className="absolute left-4 top-4 hs-chip">
-                <span className="w-2 h-2 rounded-full bg-teal" />
+                <span className="w-2 h-2 rounded-full bg-ink/60" />
                 Align damage with center guide
               </div>
               <div className="absolute right-4 top-4 hs-chip">
-                <span className="text-white/70">Scanning progress</span>
-                <span className="text-white">{frames.length}/{FRAME_TARGET}</span>
+                <span className="text-ink/70">Scanning progress</span>
+                <span className="text-ink">{frames.length}/{FRAME_TARGET}</span>
               </div>
             </div>
           </Card>
@@ -154,11 +154,11 @@ export default function Scan() {
           <div className="flex flex-col gap-6">
             <Card className="p-5">
               <div className="flex items-center justify-between">
-                <div className="text-xs tracking-widest text-white/50 uppercase">Scanning progress</div>
+                <div className="text-xs tracking-widest text-ink/50 uppercase">Scanning progress</div>
                 <div className="text-2xl font-bold">{frames.length}/{FRAME_TARGET}</div>
               </div>
-              <div className="mt-4 h-2 rounded-full bg-white/10 overflow-hidden">
-                <div className="h-2 bg-teal rounded-full" style={{ width: `${(frames.length / FRAME_TARGET) * 100}%` }} />
+              <div className="mt-4 h-2 rounded-full bg-ink/10 overflow-hidden">
+                <div className="h-2 bg-ink/70 rounded-full" style={{ width: `${(frames.length / FRAME_TARGET) * 100}%` }} />
               </div>
 
               <div className="mt-5 grid grid-cols-2 gap-3">
@@ -184,7 +184,7 @@ export default function Scan() {
             </Card>
 
             <Card className="p-5">
-              <div className="text-xs tracking-widest text-white/50 uppercase">Required angles</div>
+              <div className="text-xs tracking-widest text-ink/50 uppercase">Required angles</div>
               <div className="mt-4 flex flex-col gap-2">
                 {ANGLES.map((a, i) => {
                   const complete = frames.length >= (i + 1) * 2;
@@ -193,13 +193,13 @@ export default function Scan() {
                       key={a}
                       className={[
                         'flex items-center gap-3 rounded-xl border px-3 py-3',
-                        complete ? 'border-teal/40 bg-surface2/40' : 'border-border/50 bg-surface/30',
+                        complete ? 'border-ink/20 bg-surface2/40' : 'border-border/50 bg-surface/30',
                       ].join(' ')}
                     >
                       <div
                         className={[
                           'w-9 h-9 rounded-xl flex items-center justify-center border',
-                          complete ? 'border-teal/40 bg-teal/10 text-tealL' : 'border-border/50 text-white/40',
+                          complete ? 'border-ink/20 bg-ink/5 text-ink' : 'border-border/50 text-ink/40',
                         ].join(' ')}
                       >
                         {complete ? (
@@ -209,8 +209,8 @@ export default function Scan() {
                         )}
                       </div>
                       <div className="flex-1">
-                        <div className="font-semibold text-sm text-white/90">{a}</div>
-                        <div className="text-xs text-white/45">{complete ? 'Captured' : 'Pending'}</div>
+                        <div className="font-semibold text-sm text-ink/90">{a}</div>
+                        <div className="text-xs text-ink/45">{complete ? 'Captured' : 'Pending'}</div>
                       </div>
                     </div>
                   );
@@ -223,9 +223,9 @@ export default function Scan() {
         <Card className="p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
             <div className="font-semibold">Ready for Analysis</div>
-            <div className="text-sm text-white/50">Scan 6 frames to enable submission</div>
+            <div className="text-sm text-ink/50">Scan 6 frames to enable submission</div>
             {step === 'uploading' && (
-              <div className="text-xs text-white/50 mt-2">Uploading… {progress}%</div>
+              <div className="text-xs text-ink/50 mt-2">Uploading… {progress}%</div>
             )}
           </div>
           <Button

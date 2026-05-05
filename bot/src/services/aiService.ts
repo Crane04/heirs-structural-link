@@ -7,7 +7,7 @@ export type AiAnalyseResult = {
 };
 
 export async function analyseWithAi(frameUrls: string[], carModel: string): Promise<AiAnalyseResult> {
-  const res = await fetch(`${env.AI_SERVICE_URL}/analyse`, {
+  const res = await fetch(buildAnalyseUrl(env.AI_SERVICE_URL), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ frame_urls: frameUrls, car_model: carModel }),
@@ -31,6 +31,25 @@ export async function analyseWithAi(frameUrls: string[], carModel: string): Prom
   };
 }
 
+function buildAnalyseUrl(baseUrl: string): string {
+  const trimmed = baseUrl.replace(/\/+$/, '');
+
+  // Allow configuring either:
+  // - AI_SERVICE_URL=http://localhost:8000
+  // - AI_SERVICE_URL=http://localhost:8000/analyse
+  // - AI_SERVICE_URL=https://<provider>/... (may already include route)
+  if (trimmed.toLowerCase().endsWith('/analyse')) return trimmed;
+
+  try {
+    const url = new URL(trimmed);
+    const path = url.pathname.replace(/\/+$/, '');
+    url.pathname = path.endsWith('/analyse') ? path : `${path}/analyse`;
+    return url.toString();
+  } catch {
+    return `${trimmed}/analyse`;
+  }
+}
+
 async function safeText(res: Response): Promise<string> {
   try {
     return await res.text();
@@ -38,4 +57,3 @@ async function safeText(res: Response): Promise<string> {
     return '';
   }
 }
-

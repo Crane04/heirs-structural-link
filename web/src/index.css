@@ -4,40 +4,40 @@
 
 @layer base {
   body {
-    @apply bg-navy text-white font-sans m-0 p-0;
+    @apply bg-offwhite text-ink font-sans m-0 p-0;
     -webkit-font-smoothing: antialiased;
   }
 }
 
 @layer components {
   .hs-card {
-    @apply bg-surface border border-border border-opacity-60 rounded-2xl;
+    @apply bg-surface border border-border rounded-2xl;
   }
 
   .hs-card-soft {
-    @apply bg-white bg-opacity-5 border border-white border-opacity-10 rounded-2xl;
+    @apply bg-surface2 border border-border rounded-2xl;
   }
 
   .hs-btn {
     @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 font-semibold tracking-tight transition-colors;
   }
 
-  /* Muted primary: dark fill + teal border (no glow, no neon). */
+  /* Dark buttons on light UI. */
   .hs-btn-primary {
-    @apply hs-btn bg-surface2 border border-teal border-opacity-60 text-white hover:bg-surface2 hover:bg-opacity-80;
+    @apply hs-btn bg-ink text-offwhite hover:bg-ink hover:bg-opacity-90;
   }
 
-  /* Solid accent (use sparingly): still muted because teal token is muted. */
+  /* Solid (still dark): optionally accented border. */
   .hs-btn-solid {
-    @apply hs-btn bg-teal text-navy hover:bg-teal hover:bg-opacity-90;
+    @apply hs-btn bg-ink border border-ink border-opacity-20 text-offwhite hover:bg-ink hover:bg-opacity-90;
   }
 
   .hs-btn-secondary {
-    @apply hs-btn bg-transparent border border-border border-opacity-70 text-white text-opacity-80 hover:bg-white hover:bg-opacity-5;
+    @apply hs-btn bg-transparent border border-ink border-opacity-20 text-ink hover:bg-ink hover:bg-opacity-5;
   }
 
   .hs-chip {
-    @apply inline-flex items-center gap-2 rounded-full border border-border border-opacity-70 bg-surface2 bg-opacity-40 px-3 py-1 text-xs font-semibold text-white text-opacity-80;
+    @apply inline-flex items-center gap-2 rounded-full border border-ink border-opacity-15 bg-surface2 px-3 py-1 text-xs font-semibold text-ink text-opacity-80;
   }
 }
 

@@ -10,7 +10,7 @@ type Props = PropsWithChildren<{
 
 export default function ClaimShell({ claimId, active = 'scan', navActive = 'claims', children }: Props) {
   return (
-    <div className="min-h-screen bg-navy text-white">
+    <div className="min-h-screen bg-offwhite text-ink">
       <TopNav claimId={claimId} active={navActive} compact />
       <div className="flex">
         <Sidebar claimId={claimId} active={active} />
@@ -21,4 +21,3 @@ export default function ClaimShell({ claimId, active = 'scan', navActive = 'clai
     </div>
   );
 }
-

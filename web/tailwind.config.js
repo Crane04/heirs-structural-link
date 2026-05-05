@@ -4,12 +4,12 @@ export default {
   theme: {
     extend: {
       colors: {
+        offwhite: '#F7F3EA',
+        ink: '#061425',
         navy: '#061425',
-        surface: '#0B1F36',
-        surface2: '#0E2A3F',
-        border: '#123052',
-        teal: '#2AAE9B',   // muted accent (avoid neon)
-        tealL: '#74E3D3',  // highlight accent (use sparingly)
+        surface: '#FFFFFF',
+        surface2: '#F3EFE6',
+        border: '#E1DACF',
         gold: '#D9A441',
       },
       fontFamily: {

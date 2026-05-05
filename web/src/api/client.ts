@@ -22,6 +22,19 @@ export interface AnalyseResponse {
   fraudFlagged: boolean;
 }
 
+export interface SandboxAnalysePayload {
+  frameUrl: string;
+  carModel: string;
+}
+
+export interface SandboxAnalyseResponse {
+  claimId: string;
+  reportId: string;
+  fraudFlagged: boolean;
+  totalPayoutNgn: number;
+  predictions: Prediction[];
+}
+
 export interface Claim {
   _id: string;
   phoneNumber: string;
@@ -70,4 +83,7 @@ export const claimApi = {
 
   acceptPayout: (claimId: string) =>
     request(`/report/${claimId}/accept`, { method: 'POST' }),
+
+  sandboxAnalyse: (payload: SandboxAnalysePayload): Promise<SandboxAnalyseResponse> =>
+    request(`/sandbox/analyse`, { method: 'POST', body: JSON.stringify(payload) }),
 };
