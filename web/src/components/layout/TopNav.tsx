@@ -12,7 +12,7 @@ const navItems: Array<{ key: Props['active']; label: string; to: string }> = [
   { key: 'claims', label: 'Claims', to: '/' },
   { key: 'analytics', label: 'Analytics', to: '/' },
   { key: 'history', label: 'History', to: '/' },
-  { key: 'support', label: 'Support', to: '/' },
+  { key: 'support', label: 'Support', to: '/support' },
 ];
 
 export default function TopNav({ claimId, active, compact }: Props) {
@@ -51,7 +51,7 @@ export default function TopNav({ claimId, active, compact }: Props) {
             </div>
           )}
           <a href={whatsappUrl || '#'} target="_blank" rel="noreferrer">
-            <Button variant="solid" disabled={!whatsappUrl} className="px-4 py-2 text-sm rounded-lg">
+            <Button variant="whatsapp" disabled={!whatsappUrl} className="px-4 py-2 text-sm rounded-lg">
               Start on WhatsApp
             </Button>
           </a>

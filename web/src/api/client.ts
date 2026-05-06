@@ -33,6 +33,7 @@ export interface SandboxAnalyseResponse {
   fraudFlagged: boolean;
   totalPayoutNgn: number;
   predictions: Prediction[];
+  summary: string;
 }
 
 export interface Claim {

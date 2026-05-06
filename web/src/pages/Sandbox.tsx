@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import TopNav from '../components/layout/TopNav';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
+import Markdown from '../components/ui/Markdown';
 import { useCloudinaryUpload } from '../hooks/useCloudinaryUpload';
 import { claimApi } from '../api/client';
 
@@ -18,6 +19,7 @@ export default function Sandbox() {
     claimId: string;
     totalPayoutNgn: number;
     fraudFlagged: boolean;
+    summary: string;
     predictions: Array<{
       zone: string;
       damageType: string;
@@ -62,6 +64,7 @@ export default function Sandbox() {
         claimId: res.claimId,
         totalPayoutNgn: res.totalPayoutNgn,
         fraudFlagged: res.fraudFlagged,
+        summary: res.summary,
         predictions: res.predictions || [],
       });
       setStep('done');
@@ -158,29 +161,10 @@ export default function Sandbox() {
                   </div>
 
                   <div className="mt-3">
-                    <div className="text-[11px] tracking-widest uppercase text-ink/45 mb-2">Faults detected</div>
-                    {result.predictions.length === 0 ? (
-                      <div className="text-sm text-ink/55">No faults detected.</div>
-                    ) : (
-                      <div className="flex flex-col gap-2">
-                        {result.predictions.slice(0, 8).map((p, idx) => (
-                          <div key={idx} className="rounded-xl border border-border bg-surface px-4 py-3">
-                            <div className="flex items-center justify-between gap-4">
-                              <div className="font-semibold text-sm">
-                                {p.zone.replace(/_/g, ' ')}
-                              </div>
-                              <div className="hs-chip">{p.severity}</div>
-                            </div>
-                            <div className="mt-1 text-xs text-ink/55">
-                              {p.damageType} • depth {p.dentDepthCm.toFixed(1)}cm
-                            </div>
-                            {p.payoutParts && (
-                              <div className="mt-2 text-xs text-ink/55">Parts: {p.payoutParts}</div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    )}
+                    <div className="text-[11px] tracking-widest uppercase text-ink/45 mb-2">Summary</div>
+                    <div className="rounded-xl border border-border bg-surface px-4 py-3">
+                      <Markdown content={result.summary} />
+                    </div>
                   </div>
                 </div>
               )}

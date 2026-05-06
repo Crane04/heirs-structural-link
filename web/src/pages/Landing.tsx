@@ -65,10 +65,6 @@ export default function Landing() {
         {/* Hero */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
           <div>
-            <div className="hs-chip mb-6 w-fit">
-              <span className="w-2 h-2 rounded-full bg-ink" />
-              Trusted by 10k+ drivers
-            </div>
             <h1 className="text-4xl sm:text-5xl font-bold leading-[1.05] tracking-tight">
               Precision damage detection via AI
             </h1>
@@ -79,7 +75,7 @@ export default function Landing() {
 
             <div className="mt-8 flex flex-col sm:flex-row gap-3">
               <a href={whatsappUrl || '#'} target="_blank" rel="noreferrer" className="w-full sm:w-auto">
-                <Button variant="solid" disabled={!whatsappUrl} className="w-full sm:w-auto px-6 py-3 rounded-xl">
+                <Button variant="whatsapp" disabled={!whatsappUrl} className="w-full sm:w-auto px-6 py-3 rounded-xl">
                   Start on WhatsApp
                   <span className="text-offwhite/80">→</span>
                 </Button>
@@ -225,7 +221,7 @@ export default function Landing() {
             </p>
             <div className="mt-7 flex justify-center">
               <a href={whatsappUrl || '#'} target="_blank" rel="noreferrer">
-                <Button variant="solid" disabled={!whatsappUrl} className="px-8 py-3 rounded-xl">
+                <Button variant="whatsapp" disabled={!whatsappUrl} className="px-8 py-3 rounded-xl">
                   Start on WhatsApp
                 </Button>
               </a>

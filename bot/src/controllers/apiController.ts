@@ -5,6 +5,7 @@ import { analyseWithAi } from '../services/aiService';
 import { createDamageReport, getReportByClaimObjectId } from '../services/reportService';
 import { sendWhatsApp, buildClaimReadyMessage, buildFraudFlagMessage } from '../notify';
 import { clearSession } from '../session';
+import { generateFunSummary } from '../services/insightService';
 
 const SUPPORTED_MODELS = new Set(['Toyota Camry', 'Honda Accord', 'Lexus RX']);
 
@@ -38,10 +39,16 @@ export async function analyseClaim(req: Request, res: Response) {
   await claim.save();
 
   const whatsappTo = `whatsapp:${claim.phoneNumber}`;
+  const { summary } = await generateFunSummary({
+    fraudFlagged: ai.fraudFlagged,
+    totalPayoutNgn: ai.totalPayoutNgn,
+    claimId: String(claim._id),
+    predictions: ai.predictions,
+  });
   if (ai.fraudFlagged) {
-    await sendWhatsApp(whatsappTo, buildFraudFlagMessage(ai.predictions));
+    await sendWhatsApp(whatsappTo, buildFraudFlagMessage(ai.predictions, summary));
   } else {
-    await sendWhatsApp(whatsappTo, buildClaimReadyMessage(String(claim._id), ai.totalPayoutNgn, ai.predictions));
+    await sendWhatsApp(whatsappTo, buildClaimReadyMessage(String(claim._id), ai.totalPayoutNgn, ai.predictions, summary));
   }
 
   res.json({ reportId: report._id, fraudFlagged: ai.fraudFlagged });
@@ -100,11 +107,19 @@ export async function sandboxAnalyse(req: Request, res: Response) {
   claim.status = ai.fraudFlagged ? 'flagged' : 'complete';
   await claim.save();
 
+  const { summary } = await generateFunSummary({
+    fraudFlagged: ai.fraudFlagged,
+    totalPayoutNgn: ai.totalPayoutNgn,
+    claimId: String(claim._id),
+    predictions: ai.predictions,
+  });
+
   res.json({
     claimId: String(claim._id),
     reportId: String(report._id),
     fraudFlagged: ai.fraudFlagged,
     totalPayoutNgn: ai.totalPayoutNgn,
     predictions: ai.predictions,
+    summary,
   });
 }
