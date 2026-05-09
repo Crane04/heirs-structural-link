@@ -6,6 +6,7 @@ NIXPACKS_PYTHON_VERSION = "3.11"
 [phases.setup]
 # OpenCV can still require a few system shared libraries at import time in minimal
 # containers. These packages satisfy common missing .so deps like libxcb.so.1.
+nixPkgs = ["xorg.libxcb", "xorg.libXext", "xorg.libXrender", "xorg.libSM", "mesa", "glib"]
 aptPkgs = ["libxcb1", "libgl1", "libglib2.0-0", "libsm6", "libxext6", "libxrender1"]
 
 [start]
