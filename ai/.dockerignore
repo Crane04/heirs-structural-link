@@ -1,0 +1,34 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Data / dev files
+dataset/
+*.xlsx
+.env
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Torch hub cache (will be rebuilt during image build)
+.torch/
+
+# Nixpacks (not needed in Docker)
+nixpacks.toml
+
+# Test images
+test.jpg
+image.png
