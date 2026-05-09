@@ -20,6 +20,8 @@ export async function analyseClaim(req: Request, res: Response) {
   if (!carModel) throw new HttpError(400, 'No carModel provided');
   if (!SUPPORTED_MODELS.has(carModel)) throw new HttpError(400, 'Unsupported car model');
 
+  console.log(`[AnalyseClaim] Received analysis request for claim ${req.params.id} with model ${carModel} and frames:`, frameUrls);
+
   const claim = await getClaimOrThrow(req.params.id);
 
   claim.status = 'processing';
