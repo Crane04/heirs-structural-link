@@ -21,15 +21,14 @@ WORKDIR /app
 # ── Install Python deps (cached layer) ──────────────────────
 COPY requirements.txt .
 
-# Install PyTorch CPU-only builds (smaller image, no CUDA)
-# On aarch64 the +cpu tags don't exist for torchvision, so we
-# install torch from the CPU index and torchvision from PyPI.
+# Install PyTorch CPU-only builds (smaller image, no CUDA).
+# Both torch and torchvision MUST come from the CPU index —
+# the regular PyPI torchvision has CUDA extensions that crash
+# against CPU-only torch on amd64 (Railway).
 RUN pip install --no-cache-dir \
         torch==2.7.0+cpu \
-        --index-url https://download.pytorch.org/whl/cpu && \
-    pip install --no-cache-dir \
         torchvision==0.22.0 \
-        --no-deps
+        --index-url https://download.pytorch.org/whl/cpu
 
 # Install remaining deps (skip torch/torchvision since they're already installed)
 RUN pip install --no-cache-dir --no-deps timm>=1.0.0 && \
