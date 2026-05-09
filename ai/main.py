@@ -16,6 +16,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+SUPPORTED_CARS = ["Toyota Camry", "Honda Accord", "Lexus RX"]
+
 
 class AnalyseRequest(BaseModel):
     frame_urls: list[str]
@@ -39,8 +41,8 @@ def health():
 async def analyse(req: AnalyseRequest):
     if not req.frame_urls:
         raise HTTPException(status_code=400, detail="No frame URLs provided")
-    if req.car_model not in ["Toyota Camry", "Honda Accord", "Lexus RX"]:
-        raise HTTPException(status_code=400, detail="Unsupported car model")
+    if req.car_model not in SUPPORTED_CARS:
+        raise HTTPException(status_code=400, detail=f"Unsupported car model. Supported: {SUPPORTED_CARS}")
 
     try:
         result = analyse_claim(req.frame_urls, req.car_model)

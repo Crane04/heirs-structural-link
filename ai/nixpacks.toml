@@ -1,13 +1,9 @@
 [variables]
-# Railway/Nixpacks may default to Python 3.13, but several ML wheels (torch/opencv)
-# are not consistently available there. Pin to a widely-supported runtime.
 NIXPACKS_PYTHON_VERSION = "3.11"
 
 [phases.setup]
-# OpenCV can still require a few system shared libraries at import time in minimal
-# containers. These packages satisfy common missing .so deps like libxcb.so.1.
-nixPkgs = ["xorg.libxcb", "xorg.libXext", "xorg.libXrender", "xorg.libSM", "mesa", "glib"]
-aptPkgs = ["libxcb1", "libgl1", "libglib2.0-0", "libsm6", "libxext6", "libxrender1"]
+nixPkgs = ["glib"]
+aptPkgs = ["libgl1", "libglib2.0-0"]
 
 [start]
 cmd = "sh -lc 'uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}'"

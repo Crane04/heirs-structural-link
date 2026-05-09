@@ -9,7 +9,7 @@ from pricing import calculate_payout
 
 
 def download_image(url: str, dest_path: str) -> bool:
-    """Download an image from Cloudinary URL to a local temp path."""
+    """Download an image from a Cloudinary URL to a local temp path."""
     try:
         res = requests.get(url, timeout=15)
         res.raise_for_status()
@@ -62,7 +62,7 @@ def analyse_claim(frame_urls: list[str], car_model: str) -> dict:
                 # Step 4: Von Mises lookup
                 prediction = get_stress_prediction(car_model, zone, dent_depth_cm)
 
-                # Step 5: Fraud check — if stress ratio is very low but dent is deep, flag
+                # Step 5: Fraud check — low stress ratio but deep dent is suspicious
                 fraud_flagged = (
                     prediction["stress_ratio"] > 0
                     and prediction["stress_ratio"] < 0.2
@@ -82,7 +82,7 @@ def analyse_claim(frame_urls: list[str], car_model: str) -> dict:
                     "fraudFlagged":     fraud_flagged,
                 })
 
-    # Step 6: Calculate total payout
+    # Step 6: Aggregate
     total_payout = calculate_payout(all_predictions, car_model)
     fraud_flagged_overall = any(p["fraudFlagged"] for p in all_predictions)
 

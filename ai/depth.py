@@ -5,7 +5,7 @@ import numpy as np
 from pathlib import Path
 from typing import Any, Callable, cast
 
-SCALE_FACTOR = 0.15  
+SCALE_FACTOR = 0.15
 _BASE_DIR = Path(__file__).resolve().parent
 
 TransformFn = Callable[[np.ndarray], torch.Tensor]
@@ -15,10 +15,6 @@ _transforms: TransformFn | None = None
 
 
 def _trust_torch_hub_repos(repos: list[str]) -> None:
-    """
-    Pre-trust hub repos to avoid interactive y/N prompts in non-interactive runs.
-    Torch stores trusted repos in a text file under the hub dir.
-    """
     try:
         hub_dir = Path(torch.hub.get_dir()).resolve()
         trusted = hub_dir / "trusted_list"
@@ -31,7 +27,6 @@ def _trust_torch_hub_repos(repos: list[str]) -> None:
             trusted.parent.mkdir(parents=True, exist_ok=True)
             trusted.write_text("\n".join(sorted(wanted)) + "\n")
     except Exception:
-        # If this fails, torch.hub may still prompt; caller will surface error.
         return
 
 
@@ -39,7 +34,6 @@ def get_model() -> tuple[torch.nn.Module, TransformFn]:
     global _model, _transforms
     if _model is None:
         try:
-            # Ensure torch.hub cache is writable (defaults to ~/.cache/torch which may be read-only in some deploys).
             hub_dir = Path(os.getenv("TORCH_HOME", str(_BASE_DIR / ".torch"))).resolve()
             hub_dir.mkdir(parents=True, exist_ok=True)
             torch.hub.set_dir(str(hub_dir))
@@ -59,9 +53,9 @@ def get_model() -> tuple[torch.nn.Module, TransformFn]:
             _transforms = getattr(transforms_module, "small_transform", None)
         except Exception as e:
             raise RuntimeError(
-                "Failed to load MiDaS via torch.hub. This download happens on first run.\n"
-                "- Ensure the machine has internet access at least once, OR\n"
-                "- Pre-warm the Torch Hub cache and set TORCH_HOME to that cache directory.\n"
+                "Failed to load MiDaS via torch.hub.\n"
+                "- Ensure the machine has internet access on first run, OR\n"
+                "- Pre-warm the Torch Hub cache and set TORCH_HOME to that directory.\n"
                 f"Original error: {e}"
             ) from e
 
@@ -72,10 +66,7 @@ def get_model() -> tuple[torch.nn.Module, TransformFn]:
 
 
 def estimate_depth(image_path: str) -> np.ndarray:
-    """
-    Return a 2D depth map for an image.
-    Higher values = closer to the camera.
-    """
+    """Return a 2D depth map. Higher values = closer to camera."""
     model, transforms = get_model()
 
     img = cv2.imread(image_path)
@@ -83,8 +74,8 @@ def estimate_depth(image_path: str) -> np.ndarray:
         raise FileNotFoundError(f"Could not read image at path: {image_path}")
 
     img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-
     input_batch = transforms(img_rgb)
+
     with torch.no_grad():
         depth = model(input_batch)
         depth = torch.nn.functional.interpolate(
@@ -98,12 +89,9 @@ def estimate_depth(image_path: str) -> np.ndarray:
 
 
 def get_dent_depth_cm(depth_map: np.ndarray, bbox: list) -> float:
-    """
-    Estimate dent depth in centimetres from the depth map at the damage bbox.
-    """
+    """Estimate dent depth in centimetres from the depth map at the damage bbox."""
     x1, y1, x2, y2 = [int(v) for v in bbox]
 
-    # Clamp to image bounds
     h, w = depth_map.shape
     x1, x2 = max(0, x1), min(w, x2)
     y1, y2 = max(0, y1), min(h, y2)
@@ -111,17 +99,16 @@ def get_dent_depth_cm(depth_map: np.ndarray, bbox: list) -> float:
     if x1 >= x2 or y1 >= y2:
         return 0.0
 
-    damage_region   = depth_map[y1:y2, x1:x2]
-    damage_depth    = float(np.mean(damage_region))
+    damage_region  = depth_map[y1:y2, x1:x2]
+    damage_depth   = float(np.mean(damage_region))
 
-    # Surrounding reference region (30px border)
     pad = 30
-    sx1, sx2 = max(0, x1-pad), min(w, x2+pad)
-    sy1, sy2 = max(0, y1-pad), min(h, y2+pad)
-    surrounding     = depth_map[sy1:sy2, sx1:sx2]
+    sx1, sx2 = max(0, x1 - pad), min(w, x2 + pad)
+    sy1, sy2 = max(0, y1 - pad), min(h, y2 + pad)
+    surrounding    = depth_map[sy1:sy2, sx1:sx2]
     reference_depth = float(np.mean(surrounding))
 
-    depth_diff      = abs(damage_depth - reference_depth)
-    dent_depth_cm   = depth_diff * SCALE_FACTOR
+    depth_diff    = abs(damage_depth - reference_depth)
+    dent_depth_cm = depth_diff * SCALE_FACTOR
 
     return round(dent_depth_cm, 2)
